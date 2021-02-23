@@ -1,7 +1,5 @@
 package com.petz.api.model;
 
-import java.io.Serializable;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -12,13 +10,13 @@ import javax.persistence.ManyToOne;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import lombok.Data;
 
 @Data
 @Entity
-public class Pet implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class Pet {
 
 	@Id
 	@GeneratedValue(generator = "increment")
@@ -28,8 +26,9 @@ public class Pet implements Serializable {
 	@Column(name = "NOME")
 	private String name;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "ID_CLIENTE", nullable = true)
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
+	@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+	@JoinColumn(name = "ID_CLIENTE")
 	private Cliente cliente;
 
 }

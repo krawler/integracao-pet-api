@@ -1,9 +1,9 @@
 package com.petz.api.model;
 
-import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -16,17 +16,17 @@ import lombok.Data;
 
 @Data
 @Entity
-public class Cliente implements Serializable {
-	
-	private static final long serialVersionUID = 1L;
+public class Cliente {
 
 	@Id
 	@GeneratedValue(generator = "increment")
 	@GenericGenerator(name = "increment", strategy = "increment")
 	private Long id;
 	
+	@Column
 	private String name;
 	
+	@Column
 	private String email;
 	
 	@OneToMany(targetEntity=Pet.class,
