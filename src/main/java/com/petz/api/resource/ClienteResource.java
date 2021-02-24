@@ -1,6 +1,7 @@
 package com.petz.api.resource;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -41,30 +42,26 @@ public class ClienteResource {
 	
 	@GetMapping("/get/{id}")
 	public ResponseEntity<Cliente> get(@PathVariable Long id) {
-		try {
-		Cliente cliente = repository.getOne(id);
+
+		Optional<Cliente> optionalCliente = repository.findById(id);
 		
-		if (cliente == null) {
+		if (!optionalCliente.isPresent()) {
 			return ResponseEntity.notFound().build();
 		}
 		
+		Cliente cliente = optionalCliente.get();		
 		return ResponseEntity.ok(cliente);
-		}
-		catch(Exception ex) {
-			ex.printStackTrace();
-		}
-		return ResponseEntity.notFound().build();
 	}
 	
 	@PutMapping("/update/{id}")
-	public ResponseEntity<Cliente> update(@PathVariable Long id, @Valid @RequestBody Cliente contato) {
+	public ResponseEntity<Cliente> update(@PathVariable Long id, @Valid @RequestBody Cliente cliente) {
 		Cliente existing = repository.getOne(id);
 		
 		if (existing == null) {
 			return ResponseEntity.notFound().build();
 		}
 		
-		BeanUtils.copyProperties(contato, existing, "id");
+		BeanUtils.copyProperties(cliente, existing, "id");
 		
 		existing = repository.save(existing);
 		

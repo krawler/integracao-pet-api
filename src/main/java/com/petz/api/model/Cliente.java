@@ -12,6 +12,8 @@ import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.GenericGenerator;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import lombok.Data;
 
 @Data
@@ -29,9 +31,10 @@ public class Cliente {
 	@Column
 	private String email;
 	
+	@JsonBackReference
 	@OneToMany(targetEntity=Pet.class,
 			   mappedBy="cliente",
 			   cascade=CascadeType.ALL,
-			   fetch=FetchType.LAZY)
+			   fetch=FetchType.EAGER)
 	private List<Pet> pets;	
 }

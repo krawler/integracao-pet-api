@@ -1,6 +1,7 @@
 package com.petz.api.resource;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.validation.Valid;
 
@@ -47,30 +48,33 @@ public class PetResource {
 	}
 	
 	@GetMapping("/get/{id}")
-	public ResponseEntity<Pet> view(@PathVariable Long id) {
+	public ResponseEntity<Pet> get(@PathVariable Long id) {
 		
-		Pet pet = repository.getOne(id);
+		Optional<Pet> optionalPet = repository.findById(id);
 		
-		if (pet == null) {
+		if (!optionalPet.isPresent()) {
 			return ResponseEntity.notFound().build();
 		}
 		
+		Pet pet = optionalPet.get();
 		return ResponseEntity.ok(pet);
 	}
 	
 	@PutMapping("/update/{id}")
-	public ResponseEntity<Pet> update(@PathVariable Long id, @Valid @RequestBody Pet contato) {
-		Pet existing = repository.getOne(id);
+	public ResponseEntity<Pet> update(@PathVariable Long id, @Valid @RequestBody Pet pet) {
 		
-		if (existing == null) {
+		Optional<Pet> existing = repository.findById(id);
+		
+		if (!existing.isPresent()) {
 			return ResponseEntity.notFound().build();
 		}
+				
+		BeanUtils.copyProperties(pet, existing, "id");
+		pet.setCliente(existing.get().getCliente());
 		
-		BeanUtils.copyProperties(contato, existing, "id");
+		pet = repository.save(pet);
 		
-		existing = repository.save(existing);
-		
-		return ResponseEntity.ok(existing);
+		return ResponseEntity.ok(pet);
 	}
 	
 	@DeleteMapping("/{id}")
