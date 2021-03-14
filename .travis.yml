@@ -1,0 +1,23 @@
+language: java
+jdk:
+  - oraclejdk11
+before_install:
+  - sudo apt-get update
+  - cd app/
+  - echo "Let's start Maven Package!"
+  - mvn clean package
+  - cd ..
+  - echo "We are in dock folder!"
+script:
+  - docker-compose build
+before_deploy:
+  - echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --pass-stdin
+deploy:
+  provider: script
+  script:
+    docker tag integracao-pet-api:latest augustrafael/integracao-pet-api:latest
+    docker push augustrafael/integracao-pet-api:latest
+  on:
+    branch: master  
+notifications:
+  email: false
