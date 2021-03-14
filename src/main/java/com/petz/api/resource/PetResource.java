@@ -77,7 +77,7 @@ public class PetResource {
 		return ResponseEntity.ok(pet);
 	}
 	
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/remove/{id}")
 	public ResponseEntity<Void> remove(@PathVariable Long id) {
 		Pet pet = repository.getOne(id);
 		

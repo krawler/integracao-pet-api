@@ -3,12 +3,14 @@ package com.petz.api.resource;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,29 +57,38 @@ public class ClienteResource {
 	
 	@PutMapping("/update/{id}")
 	public ResponseEntity<Cliente> update(@PathVariable Long id, @Valid @RequestBody Cliente cliente) {
-		Cliente existing = repository.getOne(id);
+		try {
+			Cliente existing = repository.getOne(id);
+			
+			if (existing == null) {
+				return ResponseEntity.notFound().build();
+			}
+			
+			//BeanUtils.copyProperties(cliente, existing, "id");
+			
+			cliente.setId(id);
+			existing = repository.save(cliente);
+			
+			return ResponseEntity.ok(existing);
 		
-		if (existing == null) {
+		}catch(EntityNotFoundException e) {
+			return ResponseEntity.notFound().build();
+		}catch(JpaObjectRetrievalFailureException eJpa) {
 			return ResponseEntity.notFound().build();
 		}
-		
-		BeanUtils.copyProperties(cliente, existing, "id");
-		
-		existing = repository.save(existing);
-		
-		return ResponseEntity.ok(existing);
 	}
 	
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/remove/{id}")
 	public ResponseEntity<Void> remove(@PathVariable Long id) {
-		Cliente cliente = repository.getOne(id);
 		
-		if (cliente == null) {
-			return ResponseEntity.notFound().build();
-		}
-		
-		repository.delete(cliente);
-		
-		return ResponseEntity.noContent().build();
+			Optional<Cliente> optionalCliente = repository.findById(id); 
+			Cliente cliente = optionalCliente.get();
+			
+			if (optionalCliente.isPresent()) {
+				return ResponseEntity.notFound().build();
+			}
+			
+			repository.delete(cliente);			
+			return ResponseEntity.noContent().build();
 	}
 }
